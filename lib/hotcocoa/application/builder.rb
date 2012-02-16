@@ -145,7 +145,7 @@ module Application
     # Compile any CoreData model files and copy them to the bundle.
     def compile_data_models
       spec.data_models.each do |data|
-        `/Developer/usr/bin/momc #{data} #{resources_root}/#{File.basename(data, ".xcdatamodel")}.mom`
+        `/Developer/usr/bin/momc #{Dir.pwd}/#{data} #{Dir.pwd}/#{resources_root}/#{File.basename(data, ".xcdatamodel")}.mom`
       end
     end
 
