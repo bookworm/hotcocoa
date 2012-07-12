@@ -48,7 +48,8 @@ module Application
         remove_bundle_root
       end
       build_bundle_structure
-      write_bundle_files
+      write_bundle_files   
+      copy_objc_sources
       copy_sources
       copy_resources
       compile_data_models
@@ -116,6 +117,14 @@ module Application
     def copy_sources
       spec.sources.each do |source|
         destination = File.join(resources_root, source)
+        FileUtils.mkdir_p(File.dirname(destination)) unless File.exist?(File.dirname(destination))
+        FileUtils.cp_r source, destination
+      end
+    end    
+    
+    def copy_objc_source
+      spec.objc_sources.each do |source|
+        destination = File.join(macos_root, source)
         FileUtils.mkdir_p(File.dirname(destination)) unless File.exist?(File.dirname(destination))
         FileUtils.cp_r source, destination
       end
@@ -219,8 +228,11 @@ module Application
             }
         }
       end
+    end   
+    
+    def run_compile()
       Dir.chdir(macos_root) do
-        puts `#{RbConfig::CONFIG['CC']} main.m -o #{executable_file_name} -arch x86_64 -framework MacRuby -framework Foundation -fobjc-gc-only`
+        puts `#{RbConfig::CONFIG['CC']} main.m -o #{executable_file_name} -arch x86_64 -framework MacRuby -framework Foundation -fobjc-gc-only #{compile_args}`
       end
       File.unlink(objective_c_source_file)
     end
